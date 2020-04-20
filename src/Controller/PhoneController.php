@@ -23,6 +23,9 @@ class PhoneController extends AbstractController
     public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
         $page = $request->query->get('page');
+        if(is_null($page) || $page < 1) {
+            $page = 1;
+        }
         $limit = 10;
         $phones = $phoneRepository->findAllPhones($page, $limit);
 
