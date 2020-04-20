@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 /**
  * @Route("/api/phones")
@@ -16,11 +18,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class PhoneController extends AbstractController
 {
      /**
-     * @Route("/", name="list_phone", methods={"GET"})
+     * @Route("/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
-    public function index(PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
-        $phones = $phoneRepository->findAll();
+        $page = $request->query->get('page');
+        $limit = 10;
+        $phones = $phoneRepository->findAllPhones($page, $limit);
+
         $data = $serializer->serialize($phones, 'json');
 
         return new Response($data, 200, [
