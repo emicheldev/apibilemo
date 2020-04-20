@@ -1,10 +1,3 @@
-# Utlisation de # ichUploaderBundle to Upload Files and Images sf5 avec flex
-
-Il faut ajouter sur le kernel
-[https://stackoverflow.com/questions/53699279/where-do-i-need-to-put-the-yaml-file-for-vichuploaderbundle-in-symfony-4](https://stackoverflow.com/questions/53699279/where-do-i-need-to-put-the-yaml-file-for-vichuploaderbundle-in-symfony-4)
-
-
-
 # [PHP] - P7 Openclassrooms - Créez un web service exposant une API
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c54f546aba24842b38ac067a9486bf0)](https://www.codacy.com/manual/emicheldev/Bilemoapi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emicheldev/Bilemoapi&amp;utm_campaign=Badge_Grade)
