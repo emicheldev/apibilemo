@@ -27,7 +27,7 @@ class Phone
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({ "show"})
+     * @Groups({"show"})
      */
     private $description;
 
