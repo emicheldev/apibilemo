@@ -27,4 +27,17 @@ class PhoneController extends AbstractController
             'Content-Type' => 'application/json'
         ]);
     }
+
+
+     /**
+     * @Route("/{id}", name="show_phone", methods={"GET"})
+     */
+    public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    {
+        $phone = $phoneRepository->find($phone->getId());
+        $data = $serializer->serialize($phone, 'json');
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
 }
