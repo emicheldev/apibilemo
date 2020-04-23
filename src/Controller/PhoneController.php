@@ -4,21 +4,23 @@ namespace App\Controller;
 
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 /**
- * @Route("/api/phones")
+ * @Route("/api")
  */
 
 class PhoneController extends AbstractController
 {
      /**
-     * @Route("/{page<\d+>?1}", name="list_phone", methods={"GET"})
+     * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
     public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
@@ -40,7 +42,7 @@ class PhoneController extends AbstractController
 
 
      /**
-     * @Route("/{id}", name="show_phone", methods={"GET"})
+     * @Route("/phones/{id}", name="show_phone", methods={"GET"})
      */
     public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
@@ -52,5 +54,20 @@ class PhoneController extends AbstractController
         return new Response($data, 200, [
             'Content-Type' => 'application/json'
         ]);
+    }
+
+    /**
+     * @Route("/phones", name="add_phone", methods={"POST"})
+     */
+    public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager)
+    {
+        $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
+        $entityManager->persist($phone);
+        $entityManager->flush();
+        $data = [
+            'status' => 201,
+            'message' => 'Le téléphone a bien été ajouté'
+        ];
+        return new JsonResponse($data, 201);
     }
 }
