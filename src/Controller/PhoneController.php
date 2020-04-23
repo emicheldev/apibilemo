@@ -78,4 +78,33 @@ class PhoneController extends AbstractController
         ];
         return new JsonResponse($data, 201);
     }
+
+    /**
+     * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
+     */
+    public function update(Request $request, SerializerInterface $serializer, Phone $phone, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
+        $data = json_decode($request->getContent());
+        foreach ($data as $key => $value){
+            if($key && !empty($value)) {
+                $name = ucfirst($key);
+                $setter = 'set'.$name;
+                $phoneUpdate->$setter($value);
+            }
+        }
+        $errors = $validator->validate($phoneUpdate);
+        if(count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+        $entityManager->flush();
+        $data = [
+            'status' => 200,
+            'message' => 'Le téléphone a bien été mis à jour'
+        ];
+        return new JsonResponse($data);
+    }
 }
