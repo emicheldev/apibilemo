@@ -59,6 +59,7 @@ class PhoneController extends AbstractController
 
     /**
      * @Route("/phones", name="add_phone", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
