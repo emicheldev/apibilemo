@@ -2,7 +2,7 @@
     "license": "proprietary",
     
     "name": "emicheldev/apibilemo",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "type": "library",
     "description": "API for BileMO",
     "authors": [
@@ -28,6 +28,7 @@
         "symfony/framework-bundle": "4.4.*",
         "symfony/orm-pack": "^1.0",
         "symfony/serializer-pack": "^1.0",
+        "symfony/validator": "4.4.*",
         "symfony/yaml": "4.4.*"
     },
     "require-dev": {
