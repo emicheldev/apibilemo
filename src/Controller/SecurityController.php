@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +23,17 @@ class SecurityController extends AbstractController
 {
     /**
      * @Route("/register", name="register", methods={"POST"})
+     * 
+     * @SWG\Tag(name="Register and Log in")
+     * @SWG\Response(
+     *     response=200,
+     *     description="Creates a new user",
+     *     @SWG\Schema(
+     *         type="array",
+     *         example={"username": "userN", "password": "pass"},
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     * )
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
     {
@@ -55,6 +69,16 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/login", name="login", methods={"POST"})
+     * @SWG\Tag(name="Register and Log in")
+     * @SWG\Response(
+     *     response=200,
+     *     description="Get authentication token",
+     *     @SWG\Schema(
+     *         type="array",
+     *         example={"username": "user1", "password": "pass"},
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     * )
      */
     public function login(Request $request)
     {
