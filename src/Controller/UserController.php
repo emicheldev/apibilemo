@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
+
+/**
+ * @Route("/api")
+ */
+
+class UserController extends AbstractController
+{
+     /**
+     * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function index(Request $request,UserRepository $userRepository, SerializerInterface $serializer)
+    {
+        $page = $request->query->get('page');
+        if(is_null($page) || $page < 1) {
+            $page = 1;
+        }
+        $limit = 10;
+        $users = $userRepository->findAllUsers($page, $limit);
+
+        $data = $serializer->serialize($users, 'json', [
+            'groups' => ['list']
+        ]);
+
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
+
+     /**
+     * @Route("/users/{id}", name="show_user", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function show(User $user, UserRepository $userRepository,SerializerInterface $serializer)
+    {
+        $user = $userRepository->find($user->getId());
+        $data = $serializer->serialize($user, 'json', [
+            'groups' => ['show']
+        ]);
+
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
+
+
+    /**
+     * @Route("/users/{id}", name="update_user", methods={"PUT"})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $userUpdate = $entityManager->getRepository(User::class)->find($user->getId());
+        $data = json_decode($request->getContent());
+
+        foreach ($data as $key => $value){
+            if($key && !empty($value)) {
+                $name = ucfirst($key);
+                $setter = 'set'.$name;
+                $userUpdate->$setter($value);
+            }
+        }
+        $errors = $validator->validate($userUpdate);
+        if(count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+        $entityManager->flush();
+        $data = [
+            'status' => 200,
+            'message' => 'Le client a bien été mis à jour'
+        ];
+        return new JsonResponse($data);
+    }
+
+     /**
+     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function delete(User $user, EntityManagerInterface $entityManager)
+    {
+        $entityManager->remove($user);
+        $entityManager->flush();
+        return new Response(null, 204);
+    }
+}
