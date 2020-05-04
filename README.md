@@ -1,7 +1,6 @@
-# [PHP] - P7 Openclassrooms - Créez un web service exposant une API
+# PHP - P7 Openclassrooms - Créez un web service exposant une API
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c54f546aba24842b38ac067a9486bf0)](https://www.codacy.com/manual/emicheldev/Bilemoapi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emicheldev/Bilemoapi&amp;utm_campaign=Badge_Grade)
-
 
 ## Installation du projet
 
@@ -81,7 +80,6 @@ Récupérez le token généré pour commencer à utiliser l'API de Bilemo.
 curl -H "Authorization: Bearer {yourtoken}" {yourdomain}/api/{entrypoint}
 ```
 
-
 ## Contexte
 
 BileMo est une entreprise offrant toute une sélection de téléphones mobiles haut de gamme.
@@ -110,4 +108,4 @@ Vous avez le choix de mettre en place un serveur Oauth et d’y faire appel (en 
 
 Le premier partenaire de BileMo est très exigeant : il requiert que vous exposiez vos données en suivant les règles des niveaux 1, 2 et 3 du modèle de Richardson. Il a demandé à ce que vous serviez les données en JSON. Si possible, le client souhaite que les réponses soient mises en cache afin d’optimiser les performances des requêtes en direction de l’API.
 
-## ⌛ Projet en cours...
+## ⌛ Projet en cours
