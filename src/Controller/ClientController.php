@@ -2,20 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
+use App\Entity\Client;
 use Swagger\Annotations as SWG;
-use App\Repository\PhoneRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use App\Repository\ClientRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
@@ -23,33 +23,33 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  * @Route("/api")
  */
 
-class PhoneController extends AbstractController
+class ClientController extends AbstractController
 {
      /**
-     * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
+     * @Route("/clients/{page<\d+>?1}", name="list_client", methods={"GET"})
      * 
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Client")
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the list of phones",
+     *     description="Returns the list of clients",
      *     @SWG\Schema(
      *         type="array",
      *         example={},
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
      * 
      */
-    public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    public function index(Request $request,ClientRepository $clientRepository, SerializerInterface $serializer)
     {
         $page = $request->query->get('page');
         if(is_null($page) || $page < 1) {
             $page = 1;
         }
         $limit = 10;
-        $phones = $phoneRepository->findAllPhones($page, $limit);
+        $clients = $clientRepository->findAllClients($page, $limit);
 
-        $data = $serializer->serialize($phones, 'json', [
+        $data = $serializer->serialize($clients, 'json', [
             'groups' => ['list']
         ]);
 
@@ -60,24 +60,25 @@ class PhoneController extends AbstractController
 
 
      /**
-     * @Route("/phones/{id}", name="show_phone", methods={"GET"})
+     * @Route("/clients/{id}", name="show_client", methods={"GET"})
      * 
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Client")
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the informations of a phone",
+     *     description="Returns the informations of a client",
      *     @SWG\Schema(
      *         type="array",
      *         example={},
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
      * 
+     * @IsGranted("ROLE_ADMIN")
      */
-    public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    public function show(Client $client, ClientRepository $clientRepository,SerializerInterface $serializer)
     {
-        $phone = $phoneRepository->find($phone->getId());
-        $data = $serializer->serialize($phone, 'json', [
+        $client = $clientRepository->find($client->getId());
+        $data = $serializer->serialize($client, 'json', [
             'groups' => ['show']
         ]);
 
@@ -87,39 +88,37 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Route("/phones", name="add_phone", methods={"POST"})
-     * 
-     * @SWG\Tag(name="Phone")
+     * @Route("/clients", name="add_client", methods={"POST"})
+     * @SWG\Tag(name="Client")
      * @SWG\Response(
      *     response=200,
-     *     description="Post a new phone (ADMIN ONLY)",
+     *     description="Add a new client",
      *     @SWG\Schema(
      *         type="array",
-     *         example={"name": "new phone", "price": "1000", "description": "phone description"},
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         example={"first_name": "fname", "last_name": "lname", "email": "example@email.com"},
+     *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
-     * 
-     * @IsGranted("ROLE_ADMIN")
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
-        $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
-        $errors = $validator->validate($phone);
+        $client = $serializer->deserialize($request->getContent(), Client::class, 'json');
+        $errors = $validator->validate($client);
+
         if(count($errors)) {
             $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 500, [
                 'Content-Type' => 'application/json'
             ]);
         }
-        $entityManager->persist($phone);
+        $client->setUser($this->getUser());
+        $entityManager->persist($client);
         $entityManager->flush();
         $data = [
             'status' => 201,
-            'message' => 'Le téléphone a bien été ajouté'
+            'message' => 'Le client a bien été ajouté'
         ];
         return new JsonResponse($data, 201);
     }
-
 
 }
