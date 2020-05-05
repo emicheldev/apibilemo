@@ -1,6 +1,6 @@
 # PHP - P7 Openclassrooms - Créez un web service exposant une API
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c54f546aba24842b38ac067a9486bf0)](https://www.codacy.com/manual/emicheldev/Bilemoapi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emicheldev/Bilemoapi&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bf62e2c0a60a4cf79d6038c717329f12)](https://www.codacy.com/manual/emicheldev/apibilemo?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emicheldev/apibilemo&amp;utm_campaign=Badge_Grade)
 
 ## Installation du projet
 
