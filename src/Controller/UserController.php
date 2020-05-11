@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Client;
 use Swagger\Annotations as SWG;
 use App\Repository\UserRepository;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -40,7 +41,7 @@ class UserController extends AbstractController
      * )
      * 
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function index(Request $request,UserRepository $userRepository, SerializerInterface $serializer)
     {
@@ -74,7 +75,7 @@ class UserController extends AbstractController
      *     )
      * ) 
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function show(User $user, UserRepository $userRepository,SerializerInterface $serializer)
     {
@@ -88,6 +89,43 @@ class UserController extends AbstractController
         ]);
     }
 
+       /**
+     * @Route("/user", name="add_user", methods={"POST"})
+     * @SWG\Tag(name="User")
+     * @SWG\Response(
+     *     response=200,
+     *     description="Add a new user",
+     *     @SWG\Schema(
+     *         type="array",
+     *         example={"first_name": "fname", "last_name": "lname", "email": "example@email.com"},
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     * )
+     * 
+     * @IsGranted("ROLE_CLIENT")
+     */
+    public function add(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    {
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+
+        $errors = $validator->validate($user);
+        if(count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+
+        dd($user->setClient($user->getClient()));
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $data = [
+            'status' => 201,
+            'message' => 'User has been added successfully, see it at (GET) /api/user/' . $user->getId()
+        ];
+
+        return new JsonResponse($data, 201);
+    }
 
 
     /**
@@ -104,7 +142,7 @@ class UserController extends AbstractController
      *     )
      * )
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function update(Request $request, SerializerInterface $serializer, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
@@ -128,7 +166,7 @@ class UserController extends AbstractController
         $entityManager->flush();
         $data = [
             'status' => 200,
-            'message' => 'Le client a bien été mis à jour'
+            'message' => 'L\'utilisateur  a bien été mis à jour'
         ];
         return new JsonResponse($data);
     }
@@ -147,7 +185,7 @@ class UserController extends AbstractController
      *     )
      * )
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function delete(User $user, EntityManagerInterface $entityManager)
     {

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\Client;
 use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -27,30 +27,30 @@ class SecurityController extends AbstractController
      * @SWG\Tag(name="Register and Log in")
      * @SWG\Response(
      *     response=200,
-     *     description="Creates a new user",
+     *     description="Creates a new client",
      *     @SWG\Schema(
      *         type="array",
      *         example={"username": "userN", "password": "pass"},
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
     {
         $values = json_decode($request->getContent());
-        if(isset($values->username,$values->password)) {
-            $user = new User();
-            $user->setUsername($values->username);
-            $user->setPassword($passwordEncoder->encodePassword($user, $values->password));
-            $user->setRoles($values->roles);
-            $errors = $validator->validate($user);
+        if(isset($values->username, $values->password)) {
+            $client = new Client();
+            $client->setUsername($values->username);
+            $client->setPassword($passwordEncoder->encodePassword($client, $values->password));
+            $client->setRoles(["ROLE_CLIENT"]);
+            $errors = $validator->validate($client);
             if(count($errors)) {
                 $errors = $serializer->serialize($errors, 'json');
                 return new Response($errors, 500, [
                     'Content-Type' => 'application/json'
                 ]);
             }
-            $entityManager->persist($user);
+            $entityManager->persist($client);
             $entityManager->flush();
 
             $data = [
@@ -76,16 +76,17 @@ class SecurityController extends AbstractController
      *     @SWG\Schema(
      *         type="array",
      *         example={"username": "user1", "password": "pass"},
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
      */
     public function login(Request $request)
     {
-        $user = $this->getUser();
+        $client = $this->getUser();
+
         return $this->json([
-            'username' => $user->getUsername(),
-            'roles' => $user->getRoles()
+            'username' => $client->getUsername(),
+            'roles' => $client->getRoles()
         ]);
     }
 }
