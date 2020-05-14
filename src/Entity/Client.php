@@ -2,15 +2,19 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ClientRepository")
+ * @UniqueEntity(fields={"username"}, message="Cet utilisateur existe déjà")
  */
-class Client
+class Client implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -24,25 +28,26 @@ class Client
      * @ORM\Column(type="string", length=255)
      * @Groups({"list", "show"})
      */
-    private $name;
+    private $username;
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $password;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="client")
      */
-    private $user;
+    private $users;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"list", "show"})
-     */
-    private $last_name;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"show"})
-     */
-    private $email;
-
+    public function __toString() {
+        return $this;
+    }
+      
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -53,28 +58,36 @@ class Client
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUsername(): ?string
     {
-        return $this->name;
+        return $this->username;
     }
 
-    public function setName(string $name): self
+    public function setUsername(string $username): self
     {
-        $this->name = $name;
+        $this->username = $username;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getPassword(): ?string
     {
-        return $this->user;
+        return $this->password;
     }
 
-    public function setUser(?User $user): self
+    public function setPassword(string $password): self
     {
-        $this->user = $user;
+        $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
     }
 
     public function addUser(User $user): self
@@ -100,27 +113,39 @@ class Client
         return $this;
     }
 
-    public function getLastName(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return $this->last_name;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_CLIENT';
+        
+        return array_unique($roles);
     }
 
-    public function setLastName(string $last_name): self
+    public function setRoles(array $roles): self
     {
-        $this->last_name = $last_name;
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
     {
-        return $this->email;
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
-    public function setEmail(string $email): self
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
     {
-        $this->email = $email;
-
-        return $this;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
+
 }

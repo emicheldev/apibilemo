@@ -25,6 +25,34 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class PhoneController extends AbstractController
 {
+    /**
+     * @Route("/phones/{id}", name="show_phone", methods={"GET"})
+     * 
+     * @SWG\Tag(name="Phone")
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns the informations of a phone",
+     *     @SWG\Schema(
+     *         type="array",
+     *         example={},
+     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *     )
+     * )
+     * @IsGranted("ROLE_CLIENT")
+     */
+    public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    {
+        $phone = $phoneRepository->find($phone->getId());
+        $data = $serializer->serialize($phone, 'json', [
+            'groups' => ['show']
+        ]);
+
+        return new Response($data, 200, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
+
      /**
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      * 
@@ -38,7 +66,7 @@ class PhoneController extends AbstractController
      *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
      *     )
      * )
-     * 
+     * @IsGranted("ROLE_CLIENT")
      */
     public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
@@ -59,32 +87,6 @@ class PhoneController extends AbstractController
     }
 
 
-     /**
-     * @Route("/phones/{id}", name="show_phone", methods={"GET"})
-     * 
-     * @SWG\Tag(name="Phone")
-     * @SWG\Response(
-     *     response=200,
-     *     description="Returns the informations of a phone",
-     *     @SWG\Schema(
-     *         type="array",
-     *         example={},
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
-     *     )
-     * )
-     * 
-     */
-    public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
-    {
-        $phone = $phoneRepository->find($phone->getId());
-        $data = $serializer->serialize($phone, 'json', [
-            'groups' => ['show']
-        ]);
-
-        return new Response($data, 200, [
-            'Content-Type' => 'application/json'
-        ]);
-    }
 
     /**
      * @Route("/phones", name="add_phone", methods={"POST"})
@@ -92,7 +94,7 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @SWG\Response(
      *     response=200,
-     *     description="Post a new phone (ADMIN ONLY)",
+     *     description="Post a new phone (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={"name": "new phone", "price": "1000", "description": "phone description"},
@@ -100,7 +102,7 @@ class PhoneController extends AbstractController
      *     )
      * )
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
