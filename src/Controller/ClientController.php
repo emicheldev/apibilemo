@@ -25,6 +25,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ClientController extends AbstractController
 {
+
+
      /**
      * @Route("/clients/{page<\d+>?1}", name="list_client", methods={"GET"})
      * 
@@ -38,6 +40,7 @@ class ClientController extends AbstractController
      *         @SWG\Items(ref=@Model(type=Client::class, groups={"full"}))
      *     )
      * )
+     * @IsGranted("ROLE_ADMIN")
      * 
      */
     public function index(Request $request,ClientRepository $clientRepository, SerializerInterface $serializer)

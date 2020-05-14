@@ -89,4 +89,5 @@ class SecurityController extends AbstractController
             'roles' => $client->getRoles()
         ]);
     }
+
 }

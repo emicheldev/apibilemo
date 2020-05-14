@@ -32,7 +32,7 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the user list (ADMIN ONLY)",
+     *     description="Returns the user list (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={},
@@ -67,7 +67,7 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the informations of an user (ADMIN ONLY)",
+     *     description="Returns the informations of an user (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={},
@@ -116,7 +116,7 @@ class UserController extends AbstractController
             ]);
         }
 
-        dd($user->setClient($user->getClient()));
+        $user->setClient($this->getUser());
         $entityManager->persist($user);
         $entityManager->flush();
         $data = [
@@ -134,7 +134,7 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @SWG\Response(
      *     response=200,
-     *     description="Edit an existing user (ADMIN ONLY)",
+     *     description="Edit an existing user (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={"username": "user2"},
@@ -177,7 +177,7 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @SWG\Response(
      *     response=204,
-     *     description="Delete an existing user (ADMIN ONLY)",
+     *     description="Delete an existing user (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={},

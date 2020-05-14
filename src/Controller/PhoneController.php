@@ -38,7 +38,7 @@ class PhoneController extends AbstractController
      *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
      *     )
      * )
-     * 
+     * @IsGranted("ROLE_CLIENT")
      */
     public function show(Phone $phone, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
@@ -66,7 +66,7 @@ class PhoneController extends AbstractController
      *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
      *     )
      * )
-     * 
+     * @IsGranted("ROLE_CLIENT")
      */
     public function index(Request $request,PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
@@ -94,7 +94,7 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @SWG\Response(
      *     response=200,
-     *     description="Post a new phone (ADMIN ONLY)",
+     *     description="Post a new phone (CLIENT ONLY)",
      *     @SWG\Schema(
      *         type="array",
      *         example={"name": "new phone", "price": "1000", "description": "phone description"},
@@ -102,7 +102,7 @@ class PhoneController extends AbstractController
      *     )
      * )
      * 
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("ROLE_CLIENT")
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
